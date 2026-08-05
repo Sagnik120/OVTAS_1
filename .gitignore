@@ -1,0 +1,39 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+build/
+dist/
+.Python
+
+# --- Virtual environments ---
+.venv/
+venv/
+env/
+
+# --- Testing / coverage ---
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# --- Editors / OS ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# --- Project-specific outputs (large / regenerable, don't commit) ---
+/outputs/
+/data/
+*.npz
+*.pt
+*.pth
+*.ckpt
+
+# --- Downloaded model weights / caches ---
+.cache/
+*.bin
