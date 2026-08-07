@@ -1,0 +1,75 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ovtas"
+version = "0.1.0"
+description = "Open-Vocabulary Zero-Shot Temporal Action Segmentation (training-free VLM + Optimal Transport pipeline)"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [
+    { name = "Sagnik Chandra", email = "sagnik@example.com" }
+]
+keywords = [
+    "temporal-action-segmentation",
+    "vision-language-models",
+    "open-vocabulary",
+    "zero-shot",
+    "optimal-transport",
+    "sinkhorn",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+dependencies = [
+    "numpy>=1.23",
+    "scipy>=1.9",
+    "pyyaml>=6.0",
+    "tqdm>=4.65",
+]
+
+[project.optional-dependencies]
+vlm = [
+    "torch>=2.0",
+    "transformers>=4.40",
+    "open-clip-torch>=2.24",
+    "pillow>=10.0",
+]
+# Video I/O for extracting frames from raw dataset videos.
+video = [
+    "opencv-python-headless>=4.9",
+    "decord>=0.6.0",
+]
+dev = [
+    "pytest>=7.4",
+    "pytest-cov>=4.1",
+    "black>=24.1",
+    "ruff>=0.4",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra -q --strict-markers"
+markers = [
+    "unit: fast, isolated unit tests",
+    "integration: end-to-end pipeline and integration tests",
+]
+
+[tool.black]
+line-length = 100
+
+[tool.ruff]
+line-length = 100
