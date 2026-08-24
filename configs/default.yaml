@@ -1,0 +1,22 @@
+# Default configuration: synthetic in-memory dataset + dependency-free
+# mock encoder. Use this to smoke-test the full pipeline / scripts on
+# ANY machine with zero downloads, before switching to configs/gtea.yaml
+# with a real VLM backbone.
+encoder:
+  name: mock
+  embed_dim: 32
+
+data:
+  name: synthetic
+  frame_stride: 1
+  prompt_dataset: default
+
+asot:
+  epsilon: 0.07
+  rho: 0.5
+  sinkhorn_iters: 100
+  sinkhorn_tol: 1.0e-6
+
+shuffle_actions: true
+seed: 0
+output_dir: outputs
