@@ -1,0 +1,30 @@
+# GTEA (smallest of the paper's three datasets) with SigLIP (the
+# paper's best-performing VLM family, Table III), sized to run on
+# limited hardware (single consumer GPU or CPU-only).
+#
+# Before using this config:
+#   1. pip install -e ".[vlm]" ".[video]"
+#   2. Follow scripts/download_gtea.py for dataset acquisition steps.
+#   3. Set data.root below to your local GTEA directory.
+encoder:
+  name: siglip
+  model_name: google/siglip-base-patch16-224
+  batch_size: 16
+  # device: cpu   # uncomment to force CPU even if a GPU is available
+
+data:
+  name: gtea
+  root: data/gtea
+  frame_stride: 1       # no subsampling; needed to cover all GTEA frames
+  max_frames: 2200       # some GTEA videos run to ~2009 frames; raised from 600
+  prompt_dataset: gtea    # GTEA-specific verb+noun prompt construction
+
+asot:
+  epsilon: 0.07
+  rho: 0.5
+  sinkhorn_iters: 100
+  sinkhorn_tol: 1.0e-6
+
+shuffle_actions: true
+seed: 0
+output_dir: outputs/gtea_siglip
