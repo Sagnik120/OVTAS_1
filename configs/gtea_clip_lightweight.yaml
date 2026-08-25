@@ -1,0 +1,28 @@
+# GTEA with CLIP ViT-B/32 (openai pretraining) -- the lightest real
+# VLM option in this codebase (~150M parameters), for machines where
+# even the small SigLIP checkpoint in configs/gtea.yaml is too heavy.
+# The paper's Table III shows CLIP slightly behind SigLIP on average
+# score, so prefer configs/gtea.yaml when your hardware allows it.
+encoder:
+  name: clip
+  model_name: ViT-B-32
+  pretrained: openai
+  batch_size: 32
+  # device: cpu
+
+data:
+  name: gtea
+  root: data/gtea
+  frame_stride: 1         # no subsampling; needed to cover all GTEA frames
+  max_frames: 2200         # some GTEA videos run to ~2009 frames; raised from 600
+  prompt_dataset: gtea
+
+asot:
+  epsilon: 0.07
+  rho: 0.5
+  sinkhorn_iters: 100
+  sinkhorn_tol: 1.0e-6
+
+shuffle_actions: true
+seed: 0
+output_dir: outputs/gtea_clip
