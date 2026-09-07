@@ -1,0 +1,28 @@
+# Default OVTAS+ configuration for mock / synthetic testing
+# Incorporates Stage 2 FAES+ (proposed) with parameter-free attention refinement.
+
+encoder:
+  name: mock
+  embed_dim: 32
+
+data:
+  name: synthetic
+  prompt_dataset: default
+
+# Stage 2 FAES+ Attention-Refined Similarity (from OVTAS_1.png)
+faes_plus:
+  enabled: true
+  tau: 0.1
+  beta: 0.5
+  normalize_refined: true
+
+# Stage 3 SMTS Optimal Transport decoder (balanced ASOT)
+asot:
+  epsilon: 0.07
+  rho: 0.5
+  sinkhorn_iters: 100
+  sinkhorn_tol: 1.0e-6
+
+shuffle_actions: true
+seed: 0
+output_dir: outputs/default_ovtas_plus

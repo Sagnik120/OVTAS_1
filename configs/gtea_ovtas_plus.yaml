@@ -1,0 +1,35 @@
+# OVTAS+ configuration for GTEA dataset with SigLIP vision-language backbone
+# Incorporates Stage 2 FAES+ (proposed) with parameter-free attention refinement:
+#   1. Temporal Self-Attention frame smoothing: X' = A_self X
+#   2. Cross-Attention frame-to-text refinement: A_cross = softmax(X' A^T / tau)
+#   3. Similarity Fusion: S' = S + beta * A_cross
+
+encoder:
+  name: siglip
+  model_name: google/siglip-base-patch16-224
+  batch_size: 16
+
+data:
+  name: gtea
+  root: data/gtea
+  frame_stride: 1       # no subsampling
+  max_frames: 2200      # covers all GTEA frames
+  prompt_dataset: gtea  # GTEA verb+noun prompt builder
+
+# Stage 2 FAES+ Attention-Refined Similarity (from OVTAS_1.png)
+faes_plus:
+  enabled: true
+  tau: 0.1              # cross-attention temperature scalar
+  beta: 0.5             # residual fusion weight scalar
+  normalize_refined: true
+
+# Stage 3 SMTS Optimal Transport decoder (balanced ASOT)
+asot:
+  epsilon: 0.07
+  rho: 0.5
+  sinkhorn_iters: 100
+  sinkhorn_tol: 1.0e-6
+
+shuffle_actions: true
+seed: 0
+output_dir: outputs/gtea_siglip_ovtas_plus
