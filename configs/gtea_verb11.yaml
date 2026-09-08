@@ -1,0 +1,37 @@
+# GTEA evaluated on the standard 11-verb protocol used in TAS literature
+# (MS-TCN, ASFormer, ASOT, OVTAS).  The raw GTEA annotation has ~74 compound
+# phrases; GTEAVerbDataset (gtea_verb11) reduces them to 11 base verbs via
+# the static mapping in src/ovtas/data/datasets.py (_GTEA_COMPOUND_TO_VERB).
+#
+# Use SigLIP (paper's best VLM, Table III).  Swap encoder.name to "clip" and
+# point at configs/gtea_clip_lightweight.yaml values if you need CPU-only.
+#
+# Before using this config:
+#   1. pip install -e ".[vlm]" ".[video]"
+#   2. Set data.root below to your local GTEA directory.
+encoder:
+  name: siglip
+  model_name: google/siglip-large-patch16-384
+  batch_size: 16
+  # device: cpu   # uncomment to force CPU even if a GPU is available
+
+data:
+  name: gtea_verb11          # uses GTEAVerbDataset: 11-verb protocol
+  root: data/gtea
+  frame_stride: 1            # no subsampling; all frames used
+  max_frames: 2200           # GTEA videos run to ~2009 frames
+  prompt_dataset: gtea       # GTEA-specific verb+noun prompt construction
+
+asot:
+  epsilon: 0.07
+  rho: 0.5
+  sinkhorn_iters: 100
+  sinkhorn_tol: 1.0e-6
+  # unbalanced_r is the paper's "r=0.04" from the unbalanced-ASOT formulation.
+  # Under the balanced OT solver used here this value is stored for documentation
+  # but is inert (see ASOTConfig docstring in stage2_smts/asot_decoder.py).
+  unbalanced_r: 0.04
+
+shuffle_actions: true
+seed: 0
+output_dir: outputs/gtea_verb11_siglip

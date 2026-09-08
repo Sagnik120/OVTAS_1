@@ -1,0 +1,37 @@
+# GTEA 11-verb protocol with SigLIP-Large and proposed FAES+ attention refinement (OVTAS+)
+# Matches the full architecture depicted in OVTAS_1.png:
+#   Stage 1: Frozen SigLIP-Large multi-modal encoding (google/siglip-large-patch16-384)
+#   Stage 2: FAES+ parameter-free Temporal Self-Attention + Cross-Attention + Similarity Fusion
+#   Stage 3: Balanced ASOT Optimal Transport decoder (epsilon=0.07, rho=0.5, r=0.04)
+
+encoder:
+  name: siglip
+  model_name: google/siglip-large-patch16-384
+  batch_size: 16
+
+data:
+  name: gtea_verb11
+  root: data/gtea
+  frame_stride: 1
+  max_frames: 2200
+  prompt_dataset: gtea
+
+# Stage 2: FAES+ Attention-Refined Similarity
+faes_plus:
+  enabled: true
+  tau: 0.05             # cross-attention temperature (sharpened for 1024-d SigLIP)
+  beta: 0.2             # residual fusion weight S' = S + beta * A_cross
+  normalize_refined: true
+  temporal_window: 3    # nearby frame smoothing window radius (in frames)
+
+# Stage 3: SMTS (ASOT Decoder)
+asot:
+  epsilon: 0.07
+  rho: 0.5
+  sinkhorn_iters: 100
+  sinkhorn_tol: 1.0e-6
+  unbalanced_r: 0.04
+
+shuffle_actions: true
+seed: 0
+output_dir: outputs/gtea_verb11_ovtas_plus
