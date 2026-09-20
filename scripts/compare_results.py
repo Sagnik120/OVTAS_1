@@ -170,13 +170,8 @@ def compare_metrics(
 
 
 def evaluate_dir_if_needed(pred_dir: str, csv_path: str | None = None) -> str:
-    """If csv_path exists, return it; otherwise evaluate predictions in pred_dir and write CSV."""
-    if csv_path and os.path.isfile(csv_path):
-        return csv_path
-
-    candidate = os.path.join(pred_dir, "metrics.csv")
-    if os.path.isfile(candidate):
-        return candidate
+    """If csv_path exists and is newer than prediction npz files, return it; otherwise recompute."""
+    out_csv = csv_path or os.path.join(pred_dir, "metrics.csv")
 
     # Search for npz files
     npz_dir = pred_dir
@@ -185,8 +180,18 @@ def evaluate_dir_if_needed(pred_dir: str, csv_path: str | None = None) -> str:
         npz_dir = os.path.join(pred_dir, "predictions")
         npz_files = sorted(glob.glob(os.path.join(npz_dir, "*.npz")))
 
+    if not npz_files and os.path.isfile(out_csv):
+        return out_csv
+
     if not npz_files:
         raise FileNotFoundError(f"No prediction .npz or metrics.csv found in {pred_dir}")
+
+    # If metrics.csv exists and is newer than all npz files, reuse it
+    if os.path.isfile(out_csv):
+        csv_mtime = os.path.getmtime(out_csv)
+        newest_npz = max(os.path.getmtime(f) for f in npz_files)
+        if csv_mtime >= newest_npz:
+            return out_csv
 
     # Compute metrics on the fly
     from ovtas.metrics import compute_all_metrics

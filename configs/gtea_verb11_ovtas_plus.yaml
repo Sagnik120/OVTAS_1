@@ -19,15 +19,15 @@ data:
 # Stage 2: FAES+ Attention-Refined Similarity
 faes_plus:
   enabled: true
-  tau: 0.05             # cross-attention temperature (sharpened for 1024-d SigLIP)
-  beta: 0.2             # residual fusion weight S' = S + beta * A_cross
+  tau: 0.02             # Sharpened cross-attention temperature (optimal for 1024-d SigLIP)
+  beta: 1.5             # Cross-attention residual fusion weight
   normalize_refined: true
-  temporal_window: 3    # nearby frame smoothing window radius (in frames)
+  temporal_window: 7    # Local temporal context window radius (±7 frames)
 
 # Stage 3: SMTS (ASOT Decoder)
 asot:
   epsilon: 0.07
-  rho: 0.5
+  rho: 0.2              # Tuned temporal prior weight to prevent prior overriding visual attention
   sinkhorn_iters: 100
   sinkhorn_tol: 1.0e-6
   unbalanced_r: 0.04
