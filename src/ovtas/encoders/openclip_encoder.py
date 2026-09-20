@@ -19,7 +19,7 @@ from typing import Sequence
 
 import numpy as np
 
-from ovtas.encoders.base import BaseVLMEncoder, _l2_normalize_rows, resolve_torch_device
+from ovtas.encoders.base import BaseVLMEncoder, _l2_normalize_rows
 from ovtas.encoders.registry import ENCODERS
 
 
@@ -48,18 +48,18 @@ class OpenCLIPEncoder(BaseVLMEncoder):
         batch_size: int = 32,
     ):
         try:
-            import open_clip  # noqa: F401
+            import open_clip
             import torch
-        except ImportError as exc:  # pragma: no cover
+        except ImportError as exc:
             raise ImportError(
                 "OpenCLIPEncoder requires the optional 'vlm' extra. Install it with:\n"
                 "    pip install -e \".[vlm]\"\n"
-                "(This pulls in torch, open-clip-torch, and Pillow.)"
+                "(This pulls in torch and open-clip-torch.)"
             ) from exc
 
         self._torch = torch
         self.name = f"openclip-{model_name}-{pretrained}"
-        self.device = resolve_torch_device(device)
+        self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
         self.batch_size = batch_size
 
         self.model, _, self.preprocess = open_clip.create_model_and_transforms(

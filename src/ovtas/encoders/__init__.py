@@ -37,3 +37,10 @@ try:
     __all__.append("SiglipEncoder")
 except ImportError:
     pass
+
+try:
+    from ovtas.encoders.openclip_encoder import OpenClipEncoder  # noqa: F401
+
+    __all__.append("OpenClipEncoder")
+except ImportError:
+    pass
