@@ -25,7 +25,7 @@ from typing import Sequence
 
 import numpy as np
 
-from ovtas.encoders.base import BaseVLMEncoder, _l2_normalize_rows
+from ovtas.encoders.base import BaseVLMEncoder, _l2_normalize_rows, resolve_torch_device
 from ovtas.encoders.registry import ENCODERS
 
 
@@ -36,13 +36,13 @@ class ClipEncoder(BaseVLMEncoder):
     Parameters
     ----------
     model_name:
-        An ``open_clip`` architecture name, e.g. ``"ViT-B-32"``
+        Architecture tag recognized by ``open_clip``, e.g. ``"ViT-B-32"``
         (default; smallest common variant, good for limited hardware)
         or ``"ViT-L-14"`` (larger, higher quality, needs more VRAM).
     pretrained:
         Pretraining tag understood by ``open_clip``, e.g. ``"openai"``.
     device:
-        ``"cpu"`` or ``"cuda"``. Defaults to CUDA if available.
+        ``"cpu"``, ``"cuda"``, or ``"mps"``. Defaults to best available GPU.
     batch_size:
         Batch size used internally when encoding many images at once.
     """
@@ -66,7 +66,7 @@ class ClipEncoder(BaseVLMEncoder):
 
         self._torch = torch
         self.name = f"clip-{model_name}-{pretrained}"
-        self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
+        self.device = resolve_torch_device(device)
         self.batch_size = batch_size
 
         self.model, _, self.preprocess = open_clip.create_model_and_transforms(

@@ -19,7 +19,7 @@ from typing import Sequence
 
 import numpy as np
 
-from ovtas.encoders.base import BaseVLMEncoder, _l2_normalize_rows
+from ovtas.encoders.base import BaseVLMEncoder, _l2_normalize_rows, resolve_torch_device
 from ovtas.encoders.registry import ENCODERS
 
 
@@ -59,7 +59,7 @@ class OpenCLIPEncoder(BaseVLMEncoder):
 
         self._torch = torch
         self.name = f"openclip-{model_name}-{pretrained}"
-        self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
+        self.device = resolve_torch_device(device)
         self.batch_size = batch_size
 
         self.model, _, self.preprocess = open_clip.create_model_and_transforms(

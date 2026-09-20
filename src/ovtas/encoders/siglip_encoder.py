@@ -23,21 +23,21 @@ from typing import Sequence
 
 import numpy as np
 
-from ovtas.encoders.base import BaseVLMEncoder, _l2_normalize_rows
+from ovtas.encoders.base import BaseVLMEncoder, _l2_normalize_rows, resolve_torch_device
 from ovtas.encoders.registry import ENCODERS
 
 
 @ENCODERS.register("siglip")
 class SiglipEncoder(BaseVLMEncoder):
-    """SigLIP via HuggingFace ``transformers``.
+    """Google SigLIP vision-language dual encoder via HuggingFace.
 
     Parameters
     ----------
     model_name:
-        A HuggingFace Hub checkpoint id, e.g.
-        ``"google/siglip-base-patch16-224"`` (default).
+        HuggingFace model id, e.g. ``"google/siglip-base-patch16-224"``
+        or ``"google/siglip-so400m-patch16-256-i18n"``.
     device:
-        ``"cpu"`` or ``"cuda"``. Defaults to CUDA if available.
+        ``"cpu"``, ``"cuda"``, or ``"mps"``. Defaults to best available GPU.
     batch_size:
         Batch size used internally when encoding many images at once.
     """
@@ -46,7 +46,7 @@ class SiglipEncoder(BaseVLMEncoder):
         self,
         model_name: str = "google/siglip-base-patch16-224",
         device: str = None,
-        batch_size: int = 32,
+        batch_size: int = 16,
     ):
         try:
             import torch
@@ -59,8 +59,8 @@ class SiglipEncoder(BaseVLMEncoder):
             ) from exc
 
         self._torch = torch
-        self.name = f"siglip-{model_name.split('/')[-1]}"
-        self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
+        self.name = f"siglip-{model_name.replace('/', '_')}"
+        self.device = resolve_torch_device(device)
         self.batch_size = batch_size
 
         self.processor = AutoProcessor.from_pretrained(model_name)

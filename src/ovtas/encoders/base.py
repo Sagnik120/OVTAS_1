@@ -72,3 +72,18 @@ def _l2_normalize_rows(x: np.ndarray) -> np.ndarray:
     x = np.asarray(x, dtype=np.float64)
     norm = np.linalg.norm(x, axis=-1, keepdims=True)
     return x / np.clip(norm, a_min=1e-8, a_max=None)
+
+
+def resolve_torch_device(device: str | None = None) -> str:
+    """Resolve compute device: prefers explicit device, then CUDA, then Apple Silicon MPS, then CPU."""
+    if device is not None:
+        return device
+    try:
+        import torch
+        if torch.cuda.is_available():
+            return "cuda"
+        if hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
+            return "mps"
+    except ImportError:
+        pass
+    return "cpu"
