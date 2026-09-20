@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OVTAS vs. OVTAS+ Visual Analytics Dashboard</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body { background-color: #f8f9fa; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        .metric-card { border-radius: 12px; transition: transform 0.2s ease; border: none; }
+        .metric-card:hover { transform: translateY(-3px); }
+        .badge-delta { font-size: 0.85rem; font-weight: 700; }
+        .hero-banner { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: white; padding: 35px 20px; border-radius: 12px; margin-bottom: 30px; }
+    </style>
+</head>
+<body>
+    <div class="container py-4">
+        <div class="hero-banner shadow text-center">
+            <h1 class="display-6 fw-bold">OVTAS vs. OVTAS+ Performance Dashboard</h1>
+            <p class="lead mb-0">Open-Vocabulary Temporal Action Segmentation (Zero-Shot VLM Alignment)</p>
+        </div>
+
+        <!-- Metric Summary Cards -->
+        <h4 class="mb-3 fw-bold">Overall Metric Performance Comparison</h4>
+        <div class="row g-3 mb-4">
+            <div class="col-md-2 col-6">
+                <div class="card metric-card shadow-sm p-3 bg-white text-center">
+                    <small class="text-muted fw-bold">Accuracy</small>
+                    <div class="h3 fw-bold text-primary my-1">11.61%</div>
+                    <small class="text-muted">Base: 11.17%</small>
+                    <span class="badge bg-success badge-delta mt-1">+0.45%</span>
+                </div>
+            </div>
+            <div class="col-md-2 col-6">
+                <div class="card metric-card shadow-sm p-3 bg-white text-center">
+                    <small class="text-muted fw-bold">Edit Score</small>
+                    <div class="h3 fw-bold text-primary my-1">15.27%</div>
+                    <small class="text-muted">Base: 15.61%</small>
+                    <span class="badge bg-success badge-delta mt-1">+-0.34%</span>
+                </div>
+            </div>
+            <div class="col-md-2 col-6">
+                <div class="card metric-card shadow-sm p-3 bg-white text-center">
+                    <small class="text-muted fw-bold">F1@10</small>
+                    <div class="h3 fw-bold text-primary my-1">6.99%</div>
+                    <small class="text-muted">Base: 7.31%</small>
+                    <span class="badge bg-success badge-delta mt-1">+-0.32%</span>
+                </div>
+            </div>
+            <div class="col-md-2 col-6">
+                <div class="card metric-card shadow-sm p-3 bg-white text-center">
+                    <small class="text-muted fw-bold">F1@25</small>
+                    <div class="h3 fw-bold text-primary my-1">4.53%</div>
+                    <small class="text-muted">Base: 4.60%</small>
+                    <span class="badge bg-success badge-delta mt-1">+-0.07%</span>
+                </div>
+            </div>
+            <div class="col-md-2 col-6">
+                <div class="card metric-card shadow-sm p-3 bg-white text-center">
+                    <small class="text-muted fw-bold">F1@50</small>
+                    <div class="h3 fw-bold text-primary my-1">1.76%</div>
+                    <small class="text-muted">Base: 1.92%</small>
+                    <span class="badge bg-success badge-delta mt-1">+-0.17%</span>
+                </div>
+            </div>
+            <div class="col-md-2 col-6">
+                <div class="card metric-card shadow-sm p-3 bg-white text-center">
+                    <small class="text-muted fw-bold">Average (Avg)</small>
+                    <div class="h3 fw-bold text-success my-1">8.03%</div>
+                    <small class="text-muted">Base: 8.12%</small>
+                    <span class="badge bg-success badge-delta mt-1">+-0.09%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Metric Charts Row -->
+        <h4 class="mb-3 fw-bold">Comparative Visual Analytics</h4>
+        <div class="row g-4 mb-4">
+            <div class="col-md-7">
+                <div class="card shadow-sm p-3 bg-white">
+                    <h6 class="fw-bold mb-3">All Metrics Side-by-Side</h6>
+                    <img src="metrics_overview/metrics_bar_comparison.png" class="img-fluid rounded" alt="Metric Bar Chart">
+                </div>
+            </div>
+            <div class="col-md-5">
+                <div class="card shadow-sm p-3 bg-white">
+                    <h6 class="fw-bold mb-3">Multi-Dimensional Capability Envelope</h6>
+                    <img src="metrics_overview/metrics_radar_chart.png" class="img-fluid rounded" alt="Radar Chart">
+                </div>
+            </div>
+        </div>
+
+        <!-- F1 Curve & Confusion Matrices -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-6">
+                <div class="card shadow-sm p-3 bg-white h-100">
+                    <h6 class="fw-bold mb-3">F1 vs. IoU Overlap Threshold (k = 0.05 to 0.75)</h6>
+                    <img src="performance_curves/f1_vs_iou_threshold_curve.png" class="img-fluid rounded" alt="F1 Curve">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card shadow-sm p-3 bg-white h-100">
+                    <h6 class="fw-bold mb-3">Confusion Matrix (OVTAS+)</h6>
+                    <img src="confusion_matrices/ovtas_plus_confusion_matrix.png" class="img-fluid rounded" alt="Confusion Matrix">
+                </div>
+            </div>
+        </div>
+
+        <!-- Video Ribbon Timeline Section -->
+        <h4 class="mb-3 fw-bold">1D Temporal Segmentation Ribbons (Ground Truth vs. Predictions)</h4>
+        <p class="text-muted">Observing how OVTAS+ with temporal-windowed attention eliminates intra-segment flickering:</p>
+        
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-dark text-white d-flex justify-content-between">
+                <span>Video: <strong>S1_Cheese_C1</strong></span>
+                <span class="badge bg-primary">Timeline Ribbon</span>
+            </div>
+            <div class="card-body text-center p-2">
+                <img src="temporal_ribbons/S1_Cheese_C1_ribbon.png" class="img-fluid rounded" alt="S1_Cheese_C1">
+            </div>
+        </div>
+        
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-dark text-white d-flex justify-content-between">
+                <span>Video: <strong>S1_CofHoney_C1</strong></span>
+                <span class="badge bg-primary">Timeline Ribbon</span>
+            </div>
+            <div class="card-body text-center p-2">
+                <img src="temporal_ribbons/S1_CofHoney_C1_ribbon.png" class="img-fluid rounded" alt="S1_CofHoney_C1">
+            </div>
+        </div>
+        
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-dark text-white d-flex justify-content-between">
+                <span>Video: <strong>S1_Coffee_C1</strong></span>
+                <span class="badge bg-primary">Timeline Ribbon</span>
+            </div>
+            <div class="card-body text-center p-2">
+                <img src="temporal_ribbons/S1_Coffee_C1_ribbon.png" class="img-fluid rounded" alt="S1_Coffee_C1">
+            </div>
+        </div>
+        
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-dark text-white d-flex justify-content-between">
+                <span>Video: <strong>S1_Hotdog_C1</strong></span>
+                <span class="badge bg-primary">Timeline Ribbon</span>
+            </div>
+            <div class="card-body text-center p-2">
+                <img src="temporal_ribbons/S1_Hotdog_C1_ribbon.png" class="img-fluid rounded" alt="S1_Hotdog_C1">
+            </div>
+        </div>
+        
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-dark text-white d-flex justify-content-between">
+                <span>Video: <strong>S1_Pealate_C1</strong></span>
+                <span class="badge bg-primary">Timeline Ribbon</span>
+            </div>
+            <div class="card-body text-center p-2">
+                <img src="temporal_ribbons/S1_Pealate_C1_ribbon.png" class="img-fluid rounded" alt="S1_Pealate_C1">
+            </div>
+        </div>
+        
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-dark text-white d-flex justify-content-between">
+                <span>Video: <strong>S1_Peanut_C1</strong></span>
+                <span class="badge bg-primary">Timeline Ribbon</span>
+            </div>
+            <div class="card-body text-center p-2">
+                <img src="temporal_ribbons/S1_Peanut_C1_ribbon.png" class="img-fluid rounded" alt="S1_Peanut_C1">
+            </div>
+        </div>
+        
+    </div>
+</body>
+</html>
