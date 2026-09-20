@@ -23,10 +23,13 @@ from __future__ import annotations
 
 import argparse
 import csv
+import glob
 import json
 import os
 import sys
 from typing import Dict, List, Tuple
+
+import numpy as np
 
 
 def read_metrics_csv(path: str) -> Tuple[List[str], Dict[str, Dict[str, float]]]:
@@ -166,29 +169,82 @@ def compare_metrics(
     print(f"  - Markdown  : {md_out_path}")
 
 
+def evaluate_dir_if_needed(pred_dir: str, csv_path: str | None = None) -> str:
+    """If csv_path exists, return it; otherwise evaluate predictions in pred_dir and write CSV."""
+    if csv_path and os.path.isfile(csv_path):
+        return csv_path
+
+    candidate = os.path.join(pred_dir, "metrics.csv")
+    if os.path.isfile(candidate):
+        return candidate
+
+    # Search for npz files
+    npz_dir = pred_dir
+    npz_files = sorted(glob.glob(os.path.join(npz_dir, "*.npz")))
+    if not npz_files and os.path.isdir(os.path.join(pred_dir, "predictions")):
+        npz_dir = os.path.join(pred_dir, "predictions")
+        npz_files = sorted(glob.glob(os.path.join(npz_dir, "*.npz")))
+
+    if not npz_files:
+        raise FileNotFoundError(f"No prediction .npz or metrics.csv found in {pred_dir}")
+
+    # Compute metrics on the fly
+    from ovtas.metrics import compute_all_metrics
+    out_csv = csv_path or os.path.join(pred_dir, "metrics.csv")
+    metric_keys = ["Acc", "Edit", "F1@10", "F1@25", "F1@50", "Avg"]
+    rows = []
+
+    for f in npz_files:
+        vid = os.path.splitext(os.path.basename(f))[0]
+        data = np.load(f, allow_pickle=True)
+        scores = compute_all_metrics(data["predicted_labels"], data["frame_labels"]).as_dict()
+        rows.append({"video_id": vid, **scores})
+
+    overall = {k: float(np.mean([r[k] for r in rows])) for k in metric_keys}
+    os.makedirs(os.path.dirname(out_csv) or ".", exist_ok=True)
+    with open(out_csv, "w", newline="", encoding="utf-8") as fh:
+        writer = csv.DictWriter(fh, fieldnames=["video_id"] + metric_keys)
+        writer.writeheader()
+        for r in rows:
+            writer.writerow(r)
+        writer.writerow({"video_id": "OVERALL", **overall})
+
+    return out_csv
+
+
 def main() -> None:
+    import glob
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--dataset", default=None, help="Name of dataset under results/ (e.g. 'gtea')")
+    parser.add_argument("--dataset-name", default=None, help="Descriptive name of dataset for report headers")
     parser.add_argument("--baseline-csv", default=None, help="Path to baseline metrics.csv")
     parser.add_argument("--plus-csv", default=None, help="Path to OVTAS+ metrics.csv")
+    parser.add_argument("--baseline-dir", default=None, help="Directory with baseline predictions or results")
+    parser.add_argument("--new-dir", "--plus-dir", dest="new_dir", default=None, help="Directory with OVTAS+ predictions or results")
     parser.add_argument("--out-dir", default=None, help="Output directory for comparison results")
 
     args = parser.parse_args()
 
-    if args.dataset:
+    if args.baseline_dir and args.new_dir:
+        dataset_name = args.dataset_name or "GTEA (SigLIP)"
+        out_dir = args.out_dir or "results/gtea/comparison"
+        baseline_csv = evaluate_dir_if_needed(args.baseline_dir)
+        plus_csv = evaluate_dir_if_needed(args.new_dir)
+    elif args.dataset:
         dataset = args.dataset
+        dataset_name = args.dataset_name or dataset
         baseline_csv = args.baseline_csv or f"results/{dataset}/baseline_ovtas/metrics.csv"
         plus_csv = args.plus_csv or f"results/{dataset}/ovtas_plus/metrics.csv"
         out_dir = args.out_dir or f"results/{dataset}/comparison"
     else:
         if not args.baseline_csv or not args.plus_csv or not args.out_dir:
-            parser.error("Specify either --dataset <name> OR all of (--baseline-csv, --plus-csv, --out-dir).")
-        dataset = os.path.basename(os.path.dirname(args.out_dir)) or "Dataset"
+            parser.error("Specify --dataset <name>, or (--baseline-dir, --new-dir), or (--baseline-csv, --plus-csv, --out-dir).")
+        dataset_name = args.dataset_name or os.path.basename(os.path.dirname(args.out_dir)) or "Dataset"
         baseline_csv = args.baseline_csv
         plus_csv = args.plus_csv
         out_dir = args.out_dir
 
-    compare_metrics(baseline_csv, plus_csv, out_dir, dataset_name=dataset)
+    compare_metrics(baseline_csv, plus_csv, out_dir, dataset_name=dataset_name)
 
 
 if __name__ == "__main__":
